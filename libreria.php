@@ -33,4 +33,63 @@ function obtnTipo($getData){ //Opciones de Tipo
   echo json_encode($getTipo); //Devolver la matriz con los valores de los tipos en formato JSON
 }
 
+/*Filtrar la información*/
+
+function filtrarDatos($filtroCiudad, $filtroTipo, $filtroPrecio,$data){
+  $itemList = Array(); //Crear una matriz donde se guardarán los valores de los tipos.
+  if($filtroCiudad == "" and $filtroTipo=="" and $filtroPrecio==""){ //Si se presiona el boton mostrar todos
+    foreach ($data as $index => $item) {
+      array_push($itemList, $item); //Agregar los valores obtenidos al vector items
+    }
+  }else{ //Si se presiona el boton buscar. NOTA: El campo precio siempre tendra un valor.
+
+    $menor = $filtroPrecio[0]; //Obtener el valor menor del rango de precios
+    $mayor = $filtroPrecio[1]; //Obtener el valor mayor del rango de precios
+
+      if($filtroCiudad == "" and $filtroTipo == ""){ //Verificar que los filtros ciudad y tipo estén vacios
+        foreach ($data as $items => $item) {
+            $precio = precioNumero($item['Precio']);
+        if ( $precio >= $menor and $precio <= $mayor){ //Comparar si el precio se encuentra dentro de los valores del filtro
+            array_push($itemList,$item ); //Devolver el objeto cuyo precio se encuentra dentro del rango establecido.
+          }
+        }
+      }
+
+      if($filtroCiudad != "" and $filtroTipo == ""){ //Comparar si el precio se encuentra dentro de los valores del filtro
+          foreach ($data as $index => $item) {
+            $precio = precioNumero($item['Precio']);
+            if ($filtroCiudad == $item['Ciudad'] and $precio > $menor and $precio < $mayor){ //Comparar si el precio se encuentra dentro de los valores del filtro
+              array_push($itemList,$item ); //Devolver el objeto cuyo precio se encuentra dentro del rango establecido.
+            }
+        }
+      }
+
+      if($filtroCiudad == "" and $filtroTipo != ""){ //Comparar si el precio se encuentra dentro de los valores del filtro
+          foreach ($data as $index => $item) {
+            $precio = precioNumero($item['Precio']);
+            if ($filtroTipo == $item['Tipo'] and $precio > $menor and $precio < $mayor){ //Comparar si el precio se encuentra dentro de los valores del filtro
+              array_push($itemList,$item ); //Devolver el objeto cuyo precio se encuentra dentro del rango establecido.
+            }
+        }
+      }
+
+      if($filtroCiudad != "" and $filtroTipo != ""){ //Comparar si el precio se encuentra dentro de los valores del filtro
+          foreach ($data as $index => $item) {
+            $precio = precioNumero($item['Precio']);
+            if ($filtroTipo == $item['Tipo'] and $filtroCiudad == $item['Ciudad'] and $precio > $menor and $precio < $mayor){ //Comparar si el precio se encuentra dentro de los valores del filtro
+              array_push($itemList,$item ); //Devolver el objeto cuyo precio se encuentra dentro del rango establecido.
+            }
+        }
+      }
+
+  }
+  echo json_encode($itemList); //Devolver el arreglo en formato JSON
+};
+
+function precioNumero($itemPrecio){ //Convertir la cadena de caracteres en numero
+  $precio = str_replace('$','',$itemPrecio); //Eliminar el símbolo Dolar
+  $precio = str_replace(',','',$precio); //Eliminar la coma (separador de miles)
+  return $precio; //Devolver el falor de tipo Numero
+}
+
 ?>
